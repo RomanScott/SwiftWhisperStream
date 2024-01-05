@@ -70,7 +70,10 @@ public class WhisperStream: Thread {
             }
             
             while !self.isCancelled {
-                if recordingPaused { continue }
+                if recordingPaused {
+                    print("Recording paused... continuing")
+                    continue
+                }
                 
                 let errno = stream_run(ctx, Unmanaged.passUnretained(self).toOpaque()) {
                     return Unmanaged<WhisperStream>.fromOpaque($3!).takeUnretainedValue().callback(
