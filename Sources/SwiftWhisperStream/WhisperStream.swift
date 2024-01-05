@@ -72,11 +72,6 @@ public class WhisperStream: Thread {
             }
             
             while !self.isCancelled {
-                if recordingPaused {
-                    print("Recording paused... continuing")
-                    continue
-                }
-                
                 let errno = stream_run(ctx, Unmanaged.passUnretained(self).toOpaque()) {
                     return Unmanaged<WhisperStream>.fromOpaque($3!).takeUnretainedValue().callback(
                         text: $0 != nil ? String(cString: $0!) : nil,
@@ -95,6 +90,8 @@ public class WhisperStream: Thread {
     }
     
     func callback(text: String?, t0: Int64, t1: Int64) -> Int32 {
+        if recordingPaused { return 0 }
+        
         if segments.isEmpty || text == nil {
             segments.append(Segment(text: "", t0: -1, t1: -1))
         }
