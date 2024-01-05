@@ -20,6 +20,7 @@ public class WhisperStream: Thread {
     
     @Published public private(set) var segments = OrderedSegments()
     @Published public private(set) var alive = true
+    @Published public private(set) var recordingPaused = false
     
     let model: URL
     let device: CaptureDevice?
@@ -46,6 +47,14 @@ public class WhisperStream: Thread {
         waiter.wait()
     }
     
+    public func pauseRecording() {
+        recordingPaused = true
+    }
+    
+    public func resumeRecording() {
+        recordingPaused = false
+    }
+    
     func task() {
         model.path.withCString { modelCStr in
             var params = stream_default_params()
@@ -61,6 +70,8 @@ public class WhisperStream: Thread {
             }
             
             while !self.isCancelled {
+                if recordingPaused { continue }
+                
                 let errno = stream_run(ctx, Unmanaged.passUnretained(self).toOpaque()) {
                     return Unmanaged<WhisperStream>.fromOpaque($3!).takeUnretainedValue().callback(
                         text: $0 != nil ? String(cString: $0!) : nil,
