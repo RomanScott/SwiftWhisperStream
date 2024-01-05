@@ -49,10 +49,12 @@ public class WhisperStream: Thread {
     
     public func pauseRecording() {
         recordingPaused = true
+        print("Recording paused")
     }
     
     public func resumeRecording() {
         recordingPaused = false
+        print("Recording resumed")
     }
     
     func task() {
